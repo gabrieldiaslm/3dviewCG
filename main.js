@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
+//Definir os tamanhos da janela
 const sizes = {
   width: window.innerWidth,
   height: window.innerHeight,
@@ -8,27 +9,32 @@ const sizes = {
 
 const aspectRatio = sizes.width / sizes.height;
 
+//Declarar as varíaveis que serão usadas
 let renderer, scene, camera, material, canvas;
 let geometry1, cube;
 let geometry2, cone;
 let geometry3, sphere;
 
-const clock = new THREE.Clock();
+//Varíaveis para a movimentação do cubo
+const minX = -1;
+const maxX = 1;
+let direction = 1;
 
 
 experience();
 animate();
 
 function experience() {
+  //Criando a cena e configurando a camera
   scene = new THREE.Scene();
   scene.background = new THREE.Color(0x000000);
   camera = new THREE.PerspectiveCamera(60, aspectRatio, 1, 1000);
+  camera.position.y = 1;
   camera.position.z = 5;
   scene.add(camera);
 
-  // Ambient Light
+  //Luz Direcional
   dirLight();
-
 
   //Chão
   createFloor();
@@ -39,7 +45,7 @@ function experience() {
   cube = new THREE.Mesh(geometry1, material);
   cube.position.z = -5
   cube.position.y = 0.5;
-  cube.castShadow = true;
+  cube.castShadow = true; //permite gerar sombras
 
   //Cone
   geometry2 = new THREE.ConeGeometry(0.5, 1, 15);
@@ -62,12 +68,13 @@ function experience() {
   scene.add(cube, cone, sphere);
   
 
-  canvas = document.getElementById("app");
+  canvas = document.getElementById("app"); //área em que o Three.js pode usar os elementos gráficos
   renderer = new THREE.WebGLRenderer({
     antialias: true,
     alpha: true,
   });
 
+  //Configurações de renderização
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.setSize(sizes.width, sizes.height);
@@ -76,22 +83,29 @@ function experience() {
   renderer.render(scene, camera);
 }
 
+//Função para gerar as animações
 function animate() {
   sphere.rotation.x += 0.01;
   sphere.rotation.y += 0.01;
+  
+  
+  // Move o cubo
 
-  cube.rotation.z += 0.0;
-
-  while (cube.position.x < 1) {
-    cube.translateX(0.01);
+  
+  cube.position.x += 0.05 * direction;
+  
+  // Condição para definir a direção do cubo
+  if (cube.position.x >= maxX || cube.position.x <= minX) {
+    direction *= -1;
   }
-
-  requestAnimationFrame(animate);
-
+  
+  
+  requestAnimationFrame(animate); //Gera um Loop da animação
   renderer.render(scene, camera);
 }
 
-let controls = new OrbitControls(camera, renderer.domElement);
+//Adiciona os controles da cena pelo mouse
+let controls = new OrbitControls(camera, renderer.domElement); 
 
 controls.mouseButtons = {
   LEFT: THREE.MOUSE.ROTATE,
@@ -112,23 +126,24 @@ function texture(src) {
     });
 }
 
+//Função para criar o chão
 function createFloor() {
-  const floorGeometry = new THREE.PlaneGeometry(50, 50); // Width and height of the plane
+  const floorGeometry = new THREE.PlaneGeometry(50, 50);
   const floorMaterial = new THREE.MeshStandardMaterial({
-    color: 0x999999,
+    color: 0xffffff,
     side: THREE.DoubleSide,
-  }); // Color it gray for now
+  });
   const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+  floor.receiveShadow = true;
 
-  // Rotate the floor to be horizontal (plane geometries are vertical by default)
+  //Rotaciona o chão para ficar na horizontal
   floor.rotation.x = Math.PI / 2;
 
-  // Add shadow properties to the floor
-  floor.receiveShadow = true;
 
   scene.add(floor);
 };
 
+//Função que cria a luz direcional
 function dirLight() {
   const light = new THREE.DirectionalLight(0xffffff, 1.5);
   light.position.set(2, 5, 2);
