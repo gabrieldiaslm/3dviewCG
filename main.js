@@ -163,9 +163,5 @@ function dirLight() {
   light.shadow.mapSize.height = 1024;
 
   scene.add(light);
-
-  // Opcional: helper para ver o volume da sombra
-  // const helper = new THREE.CameraHelper(light.shadow.camera);
-  // scene.add(helper);
 };
 
