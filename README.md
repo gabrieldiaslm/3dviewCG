@@ -1,3 +1,7 @@
+## Entregas:
+[Questões Resolvidas](./atividadeCG3D.pdf)    
+
+[Relatório](./relatório_CG.pdf)
 ## Projeto: 
 Montagem e visualização de uma cena 3D básica
 ## Objetivo:
